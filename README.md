@@ -16,6 +16,10 @@ The policy uses a hashing algorithm based on the request ID to deterministically
 3. Backend-specific configuration (endpoint URI and API key) is applied
 4. The connection is established to the selected backend
 
+# Open Points
+- 429 error retry logic
+- unproportional load distribution
+
 ## Considerations
 
 - Client-side load balancing is an alternative approach that may be suitable for some scenarios
