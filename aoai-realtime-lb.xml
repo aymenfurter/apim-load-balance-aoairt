@@ -3,24 +3,19 @@
         <base />
         <set-header name="Authorization" exists-action="delete" />
         <set-header name="api-key" exists-action="delete" />
-        <!-- Use hash of request ID for better distribution -->
         <set-variable name="requestIdHash" value="@{
             var requestId = context.RequestId.ToString();
             long hash = 0;
             
-            // Using a different hashing algorithm for better distribution
             for (int i = 0; i < requestId.Length; i++) {
                 hash = (hash * 17) + requestId[i];
             }
             
-            // Ensure we get a positive number then mod 2
             return (Math.Abs(hash) % 2).ToString();
         }" />
-        <!-- Log the selected backend for troubleshooting -->
         <trace source="Azure API Management" severity="information">
             <message>Request ID: @(context.RequestId) - Selected backend: @(context.Variables.GetValueOrDefault&lt;string&gt;("requestIdHash"))</message>
         </trace>
-        <!-- Set backend URL and API key based on the calculated hash value -->
         <choose>
             <when condition="@(context.Variables.GetValueOrDefault<string>("requestIdHash") == "0")">
                 <set-variable name="backend-host" value="wss://backend0.openai.azure.com" />
@@ -37,7 +32,6 @@
                 </trace>
             </otherwise>
         </choose>
-        <!-- Rewrite URI and set backend -->
         <rewrite-uri template="@((string)context.Variables["path-and-query"])" />
         <set-backend-service base-url="@((string)context.Variables["backend-host"])" />
     </inbound>
